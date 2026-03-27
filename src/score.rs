@@ -13,11 +13,15 @@ pub fn score1_interval(a: Interval, b: Interval) -> f64 {
 
 pub fn score2_interval(a: Interval, b: Interval) -> f64 {
     let overlap = a.overlap_len(b) as u64;
-    let max_len = (a.len() as u64).max(b.len() as u64);
-    if max_len == 0 {
+    let len_a = a.len() as u64;
+    let len_b = b.len() as u64;
+    let max_len = len_a.max(len_b) as f64;
+    let min_len = len_a.min(len_b) as f64;
+    let denom = (max_len + min_len) / 2.0;
+    if denom == 0.0 {
         0.0
     } else {
-        overlap as f64 / max_len as f64
+        overlap as f64 / denom
     }
 }
 
@@ -33,11 +37,15 @@ pub fn score1_intervals(a: &[Interval], b: &[Interval]) -> f64 {
 
 pub fn score2_intervals(a: &[Interval], b: &[Interval]) -> f64 {
     let overlap = intersection_len(a, b);
-    let max_len = total_len(a).max(total_len(b));
-    if max_len == 0 {
+    let total_a = total_len(a);
+    let total_b = total_len(b);
+    let max_len = total_a.max(total_b) as f64;
+    let min_len = total_a.min(total_b) as f64;
+    let denom = (max_len + min_len) / 2.0;
+    if denom == 0.0 {
         0.0
     } else {
-        overlap as f64 / max_len as f64
+        overlap as f64 / denom
     }
 }
 
@@ -78,10 +86,12 @@ pub fn score2_transcripts(a: &Transcript, b: &Transcript, intron_weight: f64) ->
 
     if intron_weight == 0.0 {
         let max_len = exon_len_a.max(exon_len_b);
-        if max_len == 0.0 {
+        let min_len = exon_len_a.min(exon_len_b);
+        let denom = (max_len + min_len) / 2.0;
+        if denom == 0.0 {
             0.0
         } else {
-            exon_overlap / max_len
+            exon_overlap / denom
         }
     } else {
         let a_introns = a.introns();
@@ -95,10 +105,12 @@ pub fn score2_transcripts(a: &Transcript, b: &Transcript, intron_weight: f64) ->
         let len_a = exon_len_a + intron_weight * intron_len_a;
         let len_b = exon_len_b + intron_weight * intron_len_b;
         let max_len = len_a.max(len_b);
-        if max_len == 0.0 {
+        let min_len = len_a.min(len_b);
+        let denom = (max_len + min_len) / 2.0;
+        if denom == 0.0 {
             0.0
         } else {
-            overlap / max_len
+            overlap / denom
         }
     }
 }
